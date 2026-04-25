@@ -30,6 +30,7 @@ from functools import partial
 import structlog
 from langgraph.graph import END, StateGraph
 
+from finrag.orchestration.generator import RAGGenerator
 from finrag.orchestration.nodes import (
     calculate,
     decline,
@@ -55,6 +56,7 @@ logger = structlog.get_logger(__name__)
 def build_rag_graph(
     hybrid_retriever: HybridRetriever,
     reranker: CrossEncoderReranker,
+    rag_generator: RAGGenerator | None = None,
 ) -> StateGraph:
     """Build the RAG pipeline as a LangGraph state machine.
 
@@ -67,6 +69,8 @@ def build_rag_graph(
             retrieve node.
         reranker: Initialized CrossEncoderReranker for the
             rerank node.
+        rag_generator: Optional RAGGenerator for LLM generation.
+            If None, generate/calculate nodes use stub behavior.
 
     Returns:
         Uncompiled StateGraph ready for .compile().
@@ -78,13 +82,15 @@ def build_rag_graph(
     # while providing runtime dependencies.
     retrieve_node = partial(retrieve, hybrid_retriever=hybrid_retriever)
     rerank_node = partial(rerank, reranker=reranker)
+    generate_node = partial(generate, rag_generator=rag_generator)
+    calculate_node = partial(calculate, rag_generator=rag_generator)
 
     # --- Add nodes ---
     graph.add_node("route_query", route_query)
     graph.add_node("retrieve", retrieve_node)
     graph.add_node("rerank", rerank_node)
-    graph.add_node("generate", generate)
-    graph.add_node("calculate", calculate)
+    graph.add_node("generate", generate_node)
+    graph.add_node("calculate", calculate_node)
     graph.add_node("validate", validate)
     graph.add_node("decline", decline)
     graph.add_node("handle_error", handle_error)
@@ -136,6 +142,7 @@ def build_rag_graph(
 def compile_rag_graph(
     hybrid_retriever: HybridRetriever,
     reranker: CrossEncoderReranker,
+    rag_generator: RAGGenerator | None = None,
 ) -> object:
     """Build and compile the RAG graph for execution.
 
@@ -145,11 +152,12 @@ def compile_rag_graph(
     Args:
         hybrid_retriever: Initialized HybridRetriever.
         reranker: Initialized CrossEncoderReranker.
+        rag_generator: Optional RAGGenerator for LLM generation.
 
     Returns:
         Compiled LangGraph runnable.
     """
-    graph = build_rag_graph(hybrid_retriever, reranker)
+    graph = build_rag_graph(hybrid_retriever, reranker, rag_generator)
     compiled = graph.compile()
 
     logger.info("rag_graph_compiled")
