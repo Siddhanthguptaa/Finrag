@@ -29,6 +29,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
 
+from finrag.observability.langfuse_tracer import instrument_pipeline_result, metrics
 from finrag.orchestration.memory import SessionStore
 from finrag.orchestration.prompt_config import get_active_prompt_version
 
@@ -226,6 +227,14 @@ async def query_endpoint(
             "is_valid": True,
         }
 
+    # Instrument trace (no-op if Langfuse not configured)
+    trace_summary = instrument_pipeline_result(
+        result=result,
+        request_id=request_id,
+        session_id=session_id,
+        query=body.query,
+    )
+
     answer = result.get("answer", "")
     citations = result.get("citations", [])
     session.add_turn(
@@ -263,6 +272,8 @@ async def query_endpoint(
             "is_valid": result.get("is_valid", False),
             "input_blocked": result.get("input_guard_blocked", False),
             "output_blocked": result.get("output_guard_blocked", False),
+            "trace_id": trace_summary.get("trace_id", ""),
+            "total_latency_ms": trace_summary.get("total_latency_ms", 0),
         },
     )
 
@@ -481,3 +492,21 @@ async def get_prompt_config() -> dict:
         "prompt_versions": versions,
         "status": "loaded" if versions.get("generation") != "not_loaded" else "not_loaded",
     }
+
+
+# --------------------------------------------------------------------------- #
+# GET /metrics -- Production metrics
+# --------------------------------------------------------------------------- #
+
+
+@router.get("/metrics")
+async def get_metrics() -> dict:
+    """Return production metrics summary.
+
+    Includes p50/p95 latency, cost, token usage, and operational
+    rates (decline, citation coverage, guard blocks).
+
+    Returns:
+        Dict with full metrics summary.
+    """
+    return metrics.get_summary()
