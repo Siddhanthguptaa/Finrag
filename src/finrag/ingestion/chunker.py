@@ -261,10 +261,10 @@ class SectionChunker:
             # Only look if we're not at the end of the text
             if end < total_tokens and len(chunk_text) > 100:
                 # Search last 20% of chunk for a sentence boundary
-                search_region = chunk_text[int(len(chunk_text) * 0.8):]
+                search_region = chunk_text[int(len(chunk_text) * 0.8) :]
                 # Look for period+space, newline, or other natural breaks
                 boundary = -1
-                for pattern in ['. ', '.\n', '\n\n', '\n', '; ']:
+                for pattern in [". ", ".\n", "\n\n", "\n", "; "]:
                     idx = search_region.rfind(pattern)
                     if idx != -1:
                         boundary = idx + len(pattern)

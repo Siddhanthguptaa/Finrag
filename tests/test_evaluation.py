@@ -30,7 +30,6 @@ from finrag.evaluation.ragas_evaluator import (
     compute_route_accuracy,
 )
 
-
 # --------------------------------------------------------------------------- #
 # Golden Dataset Tests
 # --------------------------------------------------------------------------- #
@@ -280,9 +279,7 @@ class TestRAGASEvaluator:
             "answer": "Revenue was approximately $100 billion in the fiscal year.",
             "citations": [{"chunk_id": "c1", "filing_reference": "10-K"}],
             "route": "retrieve",
-            "retrieved_chunks": [
-                {"text": "Total revenue reached $100 billion in fiscal year 2024."}
-            ],
+            "retrieved_chunks": [{"text": "Total revenue reached $100 billion in fiscal year 2024."}],
         }
         ir = evaluator.evaluate_item(item, result)
         assert ir.item_id == "TEST-001"
@@ -326,12 +323,18 @@ class TestRAGASEvaluator:
         evaluator = RAGASEvaluator(pass_threshold=0.3)
         items = [
             GoldenItem(
-                id="D-1", question="Revenue?", expected_answer="$100B",
-                category=Category.NUMERICAL, difficulty=Difficulty.EASY,
+                id="D-1",
+                question="Revenue?",
+                expected_answer="$100B",
+                category=Category.NUMERICAL,
+                difficulty=Difficulty.EASY,
             ),
             GoldenItem(
-                id="D-2", question="Stock price?", expected_answer="Cannot say.",
-                category=Category.OUT_OF_SCOPE, difficulty=Difficulty.EASY,
+                id="D-2",
+                question="Stock price?",
+                expected_answer="Cannot say.",
+                category=Category.OUT_OF_SCOPE,
+                difficulty=Difficulty.EASY,
                 expected_route="decline",
             ),
         ]
@@ -354,18 +357,31 @@ class TestRAGASEvaluator:
     def test_dataset_length_mismatch_raises(self):
         evaluator = RAGASEvaluator()
         with pytest.raises(ValueError, match="Mismatch"):
-            evaluator.evaluate_dataset([GoldenItem(
-                id="x", question="q", expected_answer="a",
-                category=Category.NUMERICAL, difficulty=Difficulty.EASY,
-            )], [])
+            evaluator.evaluate_dataset(
+                [
+                    GoldenItem(
+                        id="x",
+                        question="q",
+                        expected_answer="a",
+                        category=Category.NUMERICAL,
+                        difficulty=Difficulty.EASY,
+                    )
+                ],
+                [],
+            )
 
     def test_pass_threshold(self):
         evaluator = RAGASEvaluator(pass_threshold=0.0)
-        items = [GoldenItem(
-            id="P-1", question="Q?", expected_answer="A",
-            category=Category.OUT_OF_SCOPE, difficulty=Difficulty.EASY,
-            expected_route="decline",
-        )]
+        items = [
+            GoldenItem(
+                id="P-1",
+                question="Q?",
+                expected_answer="A",
+                category=Category.OUT_OF_SCOPE,
+                difficulty=Difficulty.EASY,
+                expected_route="decline",
+            )
+        ]
         results = [{"answer": "Declined.", "route": "decline", "citations": []}]
         report = evaluator.evaluate_dataset(items, results)
         assert report.passed is True

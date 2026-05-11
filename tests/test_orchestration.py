@@ -8,7 +8,7 @@ Tests cover:
 - Edge cases: empty queries, error states, step count guards
 """
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -23,12 +23,11 @@ from finrag.orchestration.nodes import (
     generate,
     handle_error,
     rerank,
-    validate,
     retrieve,
+    validate,
 )
 from finrag.orchestration.router import get_route, route_query
 from finrag.orchestration.state import VALID_ROUTES
-
 
 # --------------------------------------------------------------------------- #
 # Fixtures
@@ -41,28 +40,19 @@ def sample_chunks() -> list[dict]:
     return [
         {
             "chunk_id": "aapl_rev_001",
-            "text": (
-                "Apple Inc. reported total revenue of $383.3 billion "
-                "for fiscal year 2024."
-            ),
+            "text": ("Apple Inc. reported total revenue of $383.3 billion for fiscal year 2024."),
             "metadata": {"ticker": "AAPL", "section_name": "Item 7 - MD&A"},
             "rrf_score": 0.032,
         },
         {
             "chunk_id": "aapl_rev_002",
-            "text": (
-                "Services revenue increased 13 percent year over year "
-                "to $96.2 billion."
-            ),
+            "text": ("Services revenue increased 13 percent year over year to $96.2 billion."),
             "metadata": {"ticker": "AAPL", "section_name": "Item 7 - MD&A"},
             "rrf_score": 0.028,
         },
         {
             "chunk_id": "aapl_risk_001",
-            "text": (
-                "Apple faces risks from supply chain disruptions "
-                "in the Asia-Pacific region."
-            ),
+            "text": ("Apple faces risks from supply chain disruptions in the Asia-Pacific region."),
             "metadata": {"ticker": "AAPL", "section_name": "Item 1A - Risk Factors"},
             "rrf_score": 0.022,
         },
@@ -246,8 +236,7 @@ class TestRerankNode:
         """Reranking returns reranked chunks."""
         mock_reranker = MagicMock()
         reranked = [
-            {**c, "reranker_score": 0.9 - i * 0.1, "reranker_rank": i + 1}
-            for i, c in enumerate(sample_chunks[:2])
+            {**c, "reranker_score": 0.9 - i * 0.1, "reranker_rank": i + 1} for i, c in enumerate(sample_chunks[:2])
         ]
         mock_reranker.rerank.return_value = reranked
 
@@ -548,7 +537,7 @@ class TestPipelineE2E:
         ]
 
         compiled = compile_rag_graph(mock_retriever, mock_reranker)
-        result = invoke_pipeline(
+        invoke_pipeline(
             compiled,
             "What was revenue?",
             metadata_filter={"ticker": "AAPL"},

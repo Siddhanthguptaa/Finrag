@@ -30,6 +30,7 @@ logger = structlog.get_logger(__name__)
 # Custom exceptions: each failure mode gets its own type
 # --------------------------------------------------------------------------- #
 
+
 class EdgarError(Exception):
     """Base exception for EDGAR client errors."""
 
@@ -53,6 +54,7 @@ class EdgarRateLimitError(EdgarError):
 # --------------------------------------------------------------------------- #
 # Data models
 # --------------------------------------------------------------------------- #
+
 
 @dataclass(frozen=True)
 class FilingMetadata:
@@ -125,6 +127,7 @@ SECTION_10K_ITEMS: dict[str, str] = {
 # --------------------------------------------------------------------------- #
 # EDGAR Client
 # --------------------------------------------------------------------------- #
+
 
 class EdgarClient:
     """Async client for SEC EDGAR API.
@@ -207,12 +210,10 @@ class EdgarClient:
                             attempt=attempt + 1,
                         )
                         if attempt < self.MAX_RETRIES - 1:
-                            wait = self.BACKOFF_BASE * (2 ** attempt)
+                            wait = self.BACKOFF_BASE * (2**attempt)
                             await asyncio.sleep(wait)
                             continue
-                        raise EdgarRateLimitError(
-                            f"Rate limited by EDGAR after {self.MAX_RETRIES} attempts"
-                        )
+                        raise EdgarRateLimitError(f"Rate limited by EDGAR after {self.MAX_RETRIES} attempts")
 
                     if response.status_code == 503:
                         logger.warning(
@@ -221,12 +222,10 @@ class EdgarClient:
                             attempt=attempt + 1,
                         )
                         if attempt < self.MAX_RETRIES - 1:
-                            wait = self.BACKOFF_BASE * (2 ** attempt)
+                            wait = self.BACKOFF_BASE * (2**attempt)
                             await asyncio.sleep(wait)
                             continue
-                        raise EdgarUnavailableError(
-                            f"EDGAR unavailable (503) after {self.MAX_RETRIES} attempts"
-                        )
+                        raise EdgarUnavailableError(f"EDGAR unavailable (503) after {self.MAX_RETRIES} attempts")
 
                     response.raise_for_status()
                     return response
@@ -241,12 +240,10 @@ class EdgarClient:
                         attempt=attempt + 1,
                     )
                     if attempt < self.MAX_RETRIES - 1:
-                        wait = self.BACKOFF_BASE * (2 ** attempt)
+                        wait = self.BACKOFF_BASE * (2**attempt)
                         await asyncio.sleep(wait)
                         continue
-                    raise EdgarUnavailableError(
-                        f"EDGAR unreachable after {self.MAX_RETRIES} attempts: {e}"
-                    ) from e
+                    raise EdgarUnavailableError(f"EDGAR unreachable after {self.MAX_RETRIES} attempts: {e}") from e
 
         raise EdgarUnavailableError("Exhausted all retries")
 
@@ -281,13 +278,9 @@ class EdgarClient:
                 )
                 return cik, company_name
 
-        raise TickerNotFoundError(
-            f"Ticker '{ticker_upper}' not found in SEC EDGAR records."
-        )
+        raise TickerNotFoundError(f"Ticker '{ticker_upper}' not found in SEC EDGAR records.")
 
-    async def get_filing_urls(
-        self, cik: str, filing_type: str, count: int = 5
-    ) -> list[FilingMetadata]:
+    async def get_filing_urls(self, cik: str, filing_type: str, count: int = 5) -> list[FilingMetadata]:
         """Get recent filing URLs for a company.
 
         Args:
@@ -327,10 +320,7 @@ class EdgarClient:
         for i, form in enumerate(forms):
             if form.upper() == filing_type_upper and len(results) < count:
                 acc_no = accession_numbers[i].replace("-", "")
-                doc_url = (
-                    f"https://www.sec.gov/Archives/edgar/data/"
-                    f"{cik.lstrip('0')}/{acc_no}/{primary_docs[i]}"
-                )
+                doc_url = f"https://www.sec.gov/Archives/edgar/data/{cik.lstrip('0')}/{acc_no}/{primary_docs[i]}"
                 results.append(
                     FilingMetadata(
                         cik=cik,
@@ -344,9 +334,7 @@ class EdgarClient:
                 )
 
         if not results:
-            raise FilingNotFoundError(
-                f"No {filing_type_upper} filings found for CIK {cik} ({company_name})"
-            )
+            raise FilingNotFoundError(f"No {filing_type_upper} filings found for CIK {cik} ({company_name})")
 
         logger.info(
             "filings_found",
@@ -378,9 +366,7 @@ class EdgarClient:
         )
         return content
 
-    def parse_sections(
-        self, raw_content: str, filing_type: str
-    ) -> dict[str, str]:
+    def parse_sections(self, raw_content: str, filing_type: str) -> dict[str, str]:
         """Extract named sections from filing HTML.
 
         Uses BeautifulSoup to find section headings and extract text
@@ -506,8 +492,8 @@ class EdgarClient:
 
         # Save each section as a separate text file
         for section_name, section_text in parsed.sections.items():
-            safe_name = re.sub(r'[^\w\s-]', '', section_name).strip()
-            safe_name = re.sub(r'[\s]+', '_', safe_name).lower()
+            safe_name = re.sub(r"[^\w\s-]", "", section_name).strip()
+            safe_name = re.sub(r"[\s]+", "_", safe_name).lower()
             section_path = filing_dir / f"{safe_name}.txt"
             section_path.write_text(section_text, encoding="utf-8")
 
@@ -552,9 +538,7 @@ async def ingest_filing(
                 filing_type=filing_meta.filing_type,
             )
 
-            raw_content = await client.download_filing(
-                filing_meta.primary_document_url
-            )
+            raw_content = await client.download_filing(filing_meta.primary_document_url)
 
             sections = client.parse_sections(raw_content, filing_type)
 

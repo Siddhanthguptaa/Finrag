@@ -16,18 +16,18 @@ Usage:
         print(item["question"], item["category"])
 """
 
-from dataclasses import dataclass, field, asdict
-from enum import Enum
+from dataclasses import asdict, dataclass, field
+from enum import StrEnum
 
 
-class Category(str, Enum):
+class Category(StrEnum):
     NUMERICAL = "numerical_extraction"
     MULTI_HOP = "multi_hop_comparison"
     CONTRADICTION = "contradiction_detection"
     OUT_OF_SCOPE = "out_of_scope"
 
 
-class Difficulty(str, Enum):
+class Difficulty(StrEnum):
     EASY = "easy"
     MEDIUM = "medium"
     HARD = "hard"
@@ -48,6 +48,7 @@ class GoldenItem:
         ground_truth_citations: Expected citation references.
         metadata_filter: Optional retrieval filter.
     """
+
     id: str
     question: str
     expected_answer: str

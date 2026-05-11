@@ -14,7 +14,6 @@ import pytest
 
 from finrag.retrieval.reranker import CrossEncoderReranker, _sigmoid
 
-
 # --------------------------------------------------------------------------- #
 # Fixtures
 # --------------------------------------------------------------------------- #
@@ -60,18 +59,14 @@ def candidates() -> list[dict]:
         {
             "chunk_id": "tsla_rev_001",
             "text": (
-                "Tesla reported automotive revenue of $82.4 billion. "
-                "Vehicle deliveries totaled 1.81 million units."
+                "Tesla reported automotive revenue of $82.4 billion. Vehicle deliveries totaled 1.81 million units."
             ),
             "metadata": {"ticker": "TSLA", "section_name": "Item 7 - MD&A"},
             "rrf_score": 0.022,
         },
         {
             "chunk_id": "aapl_goodwill_001",
-            "text": (
-                "The goodwill impairment test resulted in no impairment "
-                "charge for the reporting period."
-            ),
+            "text": ("The goodwill impairment test resulted in no impairment charge for the reporting period."),
             "metadata": {"ticker": "AAPL", "section_name": "Item 8 - Financial Statements"},
             "rrf_score": 0.018,
         },
@@ -135,9 +130,7 @@ class TestRerankerInit:
 class TestRerank:
     """Tests for the rerank method."""
 
-    def test_rerank_returns_results(
-        self, reranker: CrossEncoderReranker, candidates: list[dict]
-    ) -> None:
+    def test_rerank_returns_results(self, reranker: CrossEncoderReranker, candidates: list[dict]) -> None:
         """Reranking returns results with expected fields."""
         results = reranker.rerank("What was Apple's revenue?", candidates)
         assert len(results) > 0
@@ -146,17 +139,13 @@ class TestRerank:
         assert "text" in results[0]
         assert "chunk_id" in results[0]
 
-    def test_rerank_scores_descending(
-        self, reranker: CrossEncoderReranker, candidates: list[dict]
-    ) -> None:
+    def test_rerank_scores_descending(self, reranker: CrossEncoderReranker, candidates: list[dict]) -> None:
         """Results are sorted by reranker_score descending."""
         results = reranker.rerank("What was Apple's revenue?", candidates)
         scores = [r["reranker_score"] for r in results]
         assert scores == sorted(scores, reverse=True)
 
-    def test_rerank_relevance(
-        self, reranker: CrossEncoderReranker, candidates: list[dict]
-    ) -> None:
+    def test_rerank_relevance(self, reranker: CrossEncoderReranker, candidates: list[dict]) -> None:
         """Revenue query should rank revenue chunks above risk/goodwill.
 
         Cross-encoder should understand "Apple's revenue" is about
@@ -166,40 +155,30 @@ class TestRerank:
         top_id = results[0]["chunk_id"]
         assert top_id == "aapl_rev_001"
 
-    def test_rerank_top_k_limit(
-        self, reranker: CrossEncoderReranker, candidates: list[dict]
-    ) -> None:
+    def test_rerank_top_k_limit(self, reranker: CrossEncoderReranker, candidates: list[dict]) -> None:
         """Default top_k limits output."""
         results = reranker.rerank("revenue", candidates)
         assert len(results) <= 3  # reranker fixture has top_k=3
 
-    def test_rerank_top_k_override(
-        self, reranker: CrossEncoderReranker, candidates: list[dict]
-    ) -> None:
+    def test_rerank_top_k_override(self, reranker: CrossEncoderReranker, candidates: list[dict]) -> None:
         """top_k parameter override works."""
         results = reranker.rerank("revenue", candidates, top_k=2)
         assert len(results) <= 2
 
-    def test_rerank_rank_assignment(
-        self, reranker: CrossEncoderReranker, candidates: list[dict]
-    ) -> None:
+    def test_rerank_rank_assignment(self, reranker: CrossEncoderReranker, candidates: list[dict]) -> None:
         """Reranker_rank is 1-based sequential."""
         results = reranker.rerank("revenue growth", candidates)
         ranks = [r["reranker_rank"] for r in results]
         assert ranks == list(range(1, len(results) + 1))
 
-    def test_rerank_preserves_metadata(
-        self, reranker: CrossEncoderReranker, candidates: list[dict]
-    ) -> None:
+    def test_rerank_preserves_metadata(self, reranker: CrossEncoderReranker, candidates: list[dict]) -> None:
         """Original metadata is preserved in reranked results."""
         results = reranker.rerank("Apple revenue", candidates)
         for r in results:
             assert "metadata" in r
             assert "ticker" in r["metadata"]
 
-    def test_rerank_sigmoid_scores(
-        self, reranker: CrossEncoderReranker, candidates: list[dict]
-    ) -> None:
+    def test_rerank_sigmoid_scores(self, reranker: CrossEncoderReranker, candidates: list[dict]) -> None:
         """Reranker scores are sigmoid-normalized (0-1)."""
         results = reranker.rerank("revenue analysis", candidates)
         for r in results:
@@ -214,19 +193,19 @@ class TestRerankerEdgeCases:
         results = reranker.rerank("revenue", [])
         assert results == []
 
-    def test_empty_query(
-        self, reranker: CrossEncoderReranker, candidates: list[dict]
-    ) -> None:
+    def test_empty_query(self, reranker: CrossEncoderReranker, candidates: list[dict]) -> None:
         """Empty query returns empty list."""
         results = reranker.rerank("", candidates)
         assert results == []
 
     def test_single_candidate(self, reranker: CrossEncoderReranker) -> None:
         """Single candidate is returned if above threshold."""
-        single = [{
-            "chunk_id": "test_001",
-            "text": "Apple reported $383 billion in total revenue.",
-            "metadata": {"ticker": "AAPL"},
-        }]
+        single = [
+            {
+                "chunk_id": "test_001",
+                "text": "Apple reported $383 billion in total revenue.",
+                "metadata": {"ticker": "AAPL"},
+            }
+        ]
         results = reranker.rerank("Apple revenue", single)
         assert len(results) <= 1

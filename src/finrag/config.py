@@ -70,10 +70,7 @@ class Settings(BaseSettings):
             ValueError: If user agent doesn't contain an email-like pattern.
         """
         if "@" not in v:
-            msg = (
-                "EDGAR_USER_AGENT must include an email address. "
-                "Format: 'Your Name your.email@example.com'"
-            )
+            msg = "EDGAR_USER_AGENT must include an email address. Format: 'Your Name your.email@example.com'"
             raise ValueError(msg)
         return v
 

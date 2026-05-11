@@ -152,9 +152,7 @@ class RetrievalPromptConfig(BaseModel):
     name: str = "hybrid_retrieval"
     description: str = ""
     created: str = ""
-    retrieval: RetrievalParamsConfig = Field(
-        default_factory=RetrievalParamsConfig
-    )
+    retrieval: RetrievalParamsConfig = Field(default_factory=RetrievalParamsConfig)
     reranker: RerankerConfig = Field(default_factory=RerankerConfig)
     multi_query_prompt: str = ""
     hyde_prompt: str = ""

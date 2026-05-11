@@ -18,7 +18,6 @@ import pytest
 from finrag.ingestion.chunker import Chunk, ChunkMetadata
 from finrag.vectorstore.chroma_store import ChromaStore
 
-
 # --------------------------------------------------------------------------- #
 # Fixtures
 # --------------------------------------------------------------------------- #
@@ -201,9 +200,7 @@ class TestQuery:
         top_text = results[0]["text"].lower()
         assert "revenue" in top_text
 
-    def test_query_with_ticker_filter(
-        self, store: ChromaStore, sample_chunks: list[Chunk]
-    ) -> None:
+    def test_query_with_ticker_filter(self, store: ChromaStore, sample_chunks: list[Chunk]) -> None:
         """Filtered query only returns chunks matching the filter."""
         store.add_chunks(sample_chunks)
         results = store.query(
@@ -214,9 +211,7 @@ class TestQuery:
         for r in results:
             assert r["metadata"]["ticker"] == "AAPL"
 
-    def test_query_with_section_filter(
-        self, store: ChromaStore, sample_chunks: list[Chunk]
-    ) -> None:
+    def test_query_with_section_filter(self, store: ChromaStore, sample_chunks: list[Chunk]) -> None:
         """Section filter narrows results to specific section."""
         store.add_chunks(sample_chunks)
         results = store.query(
@@ -227,9 +222,7 @@ class TestQuery:
         for r in results:
             assert r["metadata"]["section_name"] == "Item 1A - Risk Factors"
 
-    def test_query_with_compound_filter(
-        self, store: ChromaStore, sample_chunks: list[Chunk]
-    ) -> None:
+    def test_query_with_compound_filter(self, store: ChromaStore, sample_chunks: list[Chunk]) -> None:
         """Compound filter with $and operator works."""
         store.add_chunks(sample_chunks)
         results = store.query(
@@ -246,9 +239,7 @@ class TestQuery:
             assert r["metadata"]["ticker"] == "AAPL"
             assert r["metadata"]["section_name"] == "Item 7 - MD&A"
 
-    def test_query_no_results_with_impossible_filter(
-        self, store: ChromaStore, sample_chunks: list[Chunk]
-    ) -> None:
+    def test_query_no_results_with_impossible_filter(self, store: ChromaStore, sample_chunks: list[Chunk]) -> None:
         """Filter that matches nothing returns empty list."""
         store.add_chunks(sample_chunks)
         results = store.query(
@@ -258,9 +249,7 @@ class TestQuery:
         )
         assert len(results) == 0
 
-    def test_query_n_results_limit(
-        self, store: ChromaStore, sample_chunks: list[Chunk]
-    ) -> None:
+    def test_query_n_results_limit(self, store: ChromaStore, sample_chunks: list[Chunk]) -> None:
         """n_results limits the number of returned results."""
         store.add_chunks(sample_chunks)
         results = store.query("financial data", n_results=2)
@@ -270,9 +259,7 @@ class TestQuery:
 class TestDeleteAndReset:
     """Tests for deletion operations."""
 
-    def test_delete_by_ticker(
-        self, store: ChromaStore, sample_chunks: list[Chunk]
-    ) -> None:
+    def test_delete_by_ticker(self, store: ChromaStore, sample_chunks: list[Chunk]) -> None:
         """Deleting by ticker removes only that ticker's chunks."""
         store.add_chunks(sample_chunks)
         assert store.count == 5
@@ -297,9 +284,7 @@ class TestStats:
         assert stats["total_chunks"] == 0
         assert stats["collection_name"] == "test_filings"
 
-    def test_stats_with_data(
-        self, store: ChromaStore, sample_chunks: list[Chunk]
-    ) -> None:
+    def test_stats_with_data(self, store: ChromaStore, sample_chunks: list[Chunk]) -> None:
         """Stats with data shows tickers and form types."""
         store.add_chunks(sample_chunks)
         stats = store.get_stats()

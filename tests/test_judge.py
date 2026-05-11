@@ -13,13 +13,10 @@ Covers:
 
 import json
 
-import pytest
-
 from finrag.evaluation.golden_dataset import (
     Category,
     Difficulty,
     GoldenItem,
-    load_golden_dataset,
 )
 from finrag.evaluation.llm_judge import (
     CitationJudge,
@@ -36,7 +33,6 @@ from finrag.evaluation.run_eval import (
     run_judge_eval,
     run_ragas_eval,
 )
-
 
 # --------------------------------------------------------------------------- #
 # CitationScore Tests
@@ -179,12 +175,16 @@ class TestJudgeBatchReport:
         report = JudgeBatchReport(
             total_items=2,
             results=[
-                JudgeResult(citation_scores=[
-                    CitationScore(relevance=0.8, support=0.7, accuracy=0.9, composite=0.8),
-                ]),
-                JudgeResult(citation_scores=[
-                    CitationScore(relevance=0.6, support=0.5, accuracy=0.7, composite=0.6),
-                ]),
+                JudgeResult(
+                    citation_scores=[
+                        CitationScore(relevance=0.8, support=0.7, accuracy=0.9, composite=0.8),
+                    ]
+                ),
+                JudgeResult(
+                    citation_scores=[
+                        CitationScore(relevance=0.6, support=0.5, accuracy=0.7, composite=0.6),
+                    ]
+                ),
             ],
             pass_threshold=0.5,
         )
@@ -262,8 +262,11 @@ class TestMockPipeline:
 
     def test_mock_retrieve_item(self):
         item = GoldenItem(
-            id="M-1", question="Q?", expected_answer="A.",
-            category=Category.NUMERICAL, difficulty=Difficulty.EASY,
+            id="M-1",
+            question="Q?",
+            expected_answer="A.",
+            category=Category.NUMERICAL,
+            difficulty=Difficulty.EASY,
             ground_truth_citations=["AAPL 10-K FY2024"],
         )
         result = generate_mock_result(item)
@@ -274,8 +277,11 @@ class TestMockPipeline:
 
     def test_mock_decline_item(self):
         item = GoldenItem(
-            id="M-2", question="Stock price?", expected_answer="Cannot.",
-            category=Category.OUT_OF_SCOPE, difficulty=Difficulty.EASY,
+            id="M-2",
+            question="Stock price?",
+            expected_answer="Cannot.",
+            category=Category.OUT_OF_SCOPE,
+            difficulty=Difficulty.EASY,
             expected_route="decline",
         )
         result = generate_mock_result(item)
@@ -284,8 +290,11 @@ class TestMockPipeline:
 
     def test_mock_no_citations_fallback(self):
         item = GoldenItem(
-            id="M-3", question="Q?", expected_answer="A.",
-            category=Category.NUMERICAL, difficulty=Difficulty.EASY,
+            id="M-3",
+            question="Q?",
+            expected_answer="A.",
+            category=Category.NUMERICAL,
+            difficulty=Difficulty.EASY,
             ground_truth_citations=[],
         )
         result = generate_mock_result(item)
@@ -308,6 +317,7 @@ class TestEvalRunners:
 
     def test_run_ragas_category_filter(self):
         from finrag.evaluation.golden_dataset import load_by_category
+
         items = load_by_category(Category.OUT_OF_SCOPE)
         report = run_ragas_eval(items=items, threshold=0.1)
         assert report.total_items == 12

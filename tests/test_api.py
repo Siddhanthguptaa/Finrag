@@ -12,21 +12,12 @@ Covers:
 - MCP tool listing and execution
 """
 
-import json
-
 import pytest
 from fastapi.testclient import TestClient
 
 from finrag.api.app import create_app
-from finrag.api.middleware import (
-    AuthMiddleware,
-    LoggingMiddleware,
-    RateLimitMiddleware,
-    RequestIDMiddleware,
-)
-from finrag.api.mcp_server import TOOL_DEFINITIONS, MCPToolCallRequest
+from finrag.api.mcp_server import MCPToolCallRequest
 from finrag.api.routes import QueryRequest, QueryResponse, SessionResponse
-
 
 # --------------------------------------------------------------------------- #
 # Fixtures

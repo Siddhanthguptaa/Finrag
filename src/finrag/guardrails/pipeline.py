@@ -25,8 +25,8 @@ Design decisions:
 
 import structlog
 
-from finrag.guardrails.input_guard import GuardReport, run_input_guards
-from finrag.guardrails.output_guard import OutputGuardReport, run_output_guards
+from finrag.guardrails.input_guard import run_input_guards
+from finrag.guardrails.output_guard import run_output_guards
 from finrag.orchestration.state import GraphState
 
 logger = structlog.get_logger(__name__)

@@ -19,13 +19,9 @@ import tiktoken
 
 from finrag.ingestion.chunker import (
     DEFAULT_ENCODING,
-    MIN_CHUNK_SIZE,
-    Chunk,
-    ChunkMetadata,
     SectionChunker,
     chunk_filing_directory,
 )
-
 
 # --------------------------------------------------------------------------- #
 # Fixtures
@@ -197,13 +193,10 @@ class TestChunkBounds:
             token_count = len(encoding.encode(chunk.text))
             # Allow some tolerance for sentence-boundary rounding
             assert token_count <= chunker.chunk_size + 50, (
-                f"Chunk {chunk.metadata.chunk_index} has {token_count} tokens, "
-                f"exceeds limit of {chunker.chunk_size}"
+                f"Chunk {chunk.metadata.chunk_index} has {token_count} tokens, exceeds limit of {chunker.chunk_size}"
             )
 
-    def test_multiple_chunks_from_long_text(
-        self, chunker: SectionChunker, long_text: str
-    ) -> None:
+    def test_multiple_chunks_from_long_text(self, chunker: SectionChunker, long_text: str) -> None:
         """Long text should produce multiple chunks."""
         chunks = chunker.chunk_text(
             text=long_text,
@@ -215,9 +208,7 @@ class TestChunkBounds:
         # ~715 tokens / 500 chunk_size = 2 chunks with overlap
         assert len(chunks) >= 2, f"Expected >= 2 chunks, got {len(chunks)}"
 
-    def test_short_text_single_chunk(
-        self, chunker: SectionChunker, short_text: str
-    ) -> None:
+    def test_short_text_single_chunk(self, chunker: SectionChunker, short_text: str) -> None:
         """Text shorter than chunk_size produces exactly one chunk."""
         chunks = chunker.chunk_text(
             text=short_text,
@@ -254,9 +245,7 @@ class TestChunkBounds:
 class TestChunkOverlap:
     """Tests for overlap behavior between consecutive chunks."""
 
-    def test_consecutive_chunks_share_text(
-        self, small_chunker: SectionChunker
-    ) -> None:
+    def test_consecutive_chunks_share_text(self, small_chunker: SectionChunker) -> None:
         """Consecutive chunks should share overlapping text content.
 
         We verify this by checking that the end of chunk N appears
@@ -283,8 +272,7 @@ class TestChunkOverlap:
             next_words = set(next_start.split())
             shared = current_words & next_words
             assert len(shared) > 0, (
-                f"No overlap between chunk {i} and {i+1}. "
-                f"End: '{current_end}' | Start: '{next_start}'"
+                f"No overlap between chunk {i} and {i + 1}. End: '{current_end}' | Start: '{next_start}'"
             )
 
 
@@ -379,9 +367,7 @@ class TestChunkMetadata:
         ids = [c.metadata.chunk_id for c in chunks]
         assert len(ids) == len(set(ids)), "Duplicate chunk IDs found"
 
-    def test_chunk_ids_are_deterministic(
-        self, chunker: SectionChunker, long_text: str
-    ) -> None:
+    def test_chunk_ids_are_deterministic(self, chunker: SectionChunker, long_text: str) -> None:
         """Re-chunking the same text produces the same chunk IDs."""
         chunks_1 = chunker.chunk_text(
             text=long_text,
@@ -405,9 +391,7 @@ class TestChunkMetadata:
 class TestChunkFiling:
     """Tests for multi-section filing chunking."""
 
-    def test_chunk_filing_multiple_sections(
-        self, chunker: SectionChunker, sample_sections: dict[str, str]
-    ) -> None:
+    def test_chunk_filing_multiple_sections(self, chunker: SectionChunker, sample_sections: dict[str, str]) -> None:
         """Chunking a multi-section filing produces chunks from all sections."""
         chunks = chunker.chunk_filing(
             sections=sample_sections,
@@ -416,9 +400,7 @@ class TestChunkFiling:
             filing_date="2024-10-31",
             company_name="Apple Inc.",
         )
-        assert len(chunks) > len(sample_sections), (
-            "Should produce more chunks than sections (sections are long)"
-        )
+        assert len(chunks) > len(sample_sections), "Should produce more chunks than sections (sections are long)"
 
         # Verify all sections are represented
         section_names = {c.metadata.section_name for c in chunks}
@@ -443,8 +425,7 @@ class TestChunkFiling:
             chunk_words = chunk.text.split()[:5]  # Check first 5 words
             for word in chunk_words:
                 assert word in section_text, (
-                    f"Word '{word}' from chunk (section={section_name}) "
-                    f"not found in section text"
+                    f"Word '{word}' from chunk (section={section_name}) not found in section text"
                 )
 
 

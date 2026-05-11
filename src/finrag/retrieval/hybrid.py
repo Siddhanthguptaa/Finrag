@@ -112,11 +112,7 @@ def reciprocal_rank_fusion(
     source_names = ["dense", "sparse"]
 
     for list_idx, ranked_list in enumerate(ranked_lists):
-        source_name = (
-            source_names[list_idx]
-            if list_idx < len(source_names)
-            else f"source_{list_idx}"
-        )
+        source_name = source_names[list_idx] if list_idx < len(source_names) else f"source_{list_idx}"
         for rank, result in enumerate(ranked_list, start=1):
             chunk_id = result["chunk_id"]
             scores[chunk_id] += 1.0 / (k + rank)

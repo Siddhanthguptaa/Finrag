@@ -17,7 +17,6 @@ import pytest
 from finrag.ingestion.chunker import Chunk, ChunkMetadata
 from finrag.retrieval.bm25_index import BM25Index, tokenize
 
-
 # --------------------------------------------------------------------------- #
 # Fixtures
 # --------------------------------------------------------------------------- #
@@ -333,9 +332,7 @@ class TestFilteredQuery:
 class TestSerialization:
     """Tests for save/load round-trip."""
 
-    def test_save_and_load(
-        self, built_index: BM25Index, tmp_path: Path
-    ) -> None:
+    def test_save_and_load(self, built_index: BM25Index, tmp_path: Path) -> None:
         """Index survives save/load cycle with same results."""
         save_path = tmp_path / "bm25.pkl"
         built_index.save(save_path)

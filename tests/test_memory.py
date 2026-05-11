@@ -11,11 +11,8 @@ Covers:
 - Prompt context injection
 """
 
-import tempfile
-import time
 from pathlib import Path
 
-import pytest
 import yaml
 
 from finrag.orchestration.memory import (
@@ -30,17 +27,11 @@ from finrag.orchestration.prompt_config import (
     EnforcementConfig,
     GenerationPromptConfig,
     ModelConfig,
-    RerankerConfig,
-    RetrievalParamsConfig,
     RetrievalPromptConfig,
-    _generation_config,
-    _retrieval_config,
     get_active_prompt_version,
     load_generation_config,
     load_retrieval_config,
-    reload_configs,
 )
-
 
 # =========================================================================== #
 # Prompt Config Tests
@@ -144,6 +135,7 @@ class TestLoadGenerationConfig:
 
         # Clear cache
         import finrag.orchestration.prompt_config as pc
+
         pc._generation_config = None
 
         config = load_generation_config(version="v1", configs_dir=tmp_path)
@@ -154,6 +146,7 @@ class TestLoadGenerationConfig:
 
     def test_missing_yaml_returns_defaults(self, tmp_path):
         import finrag.orchestration.prompt_config as pc
+
         pc._generation_config = None
 
         config = load_generation_config(version="v99", configs_dir=tmp_path)
@@ -166,6 +159,7 @@ class TestLoadGenerationConfig:
         yaml_path.write_text(yaml.dump(config_data))
 
         import finrag.orchestration.prompt_config as pc
+
         pc._generation_config = None
 
         config1 = load_generation_config(version="v1", configs_dir=tmp_path)
@@ -186,6 +180,7 @@ class TestLoadRetrievalConfig:
         yaml_path.write_text(yaml.dump(config_data))
 
         import finrag.orchestration.prompt_config as pc
+
         pc._retrieval_config = None
 
         config = load_retrieval_config(version="v1", configs_dir=tmp_path)
@@ -194,6 +189,7 @@ class TestLoadRetrievalConfig:
 
     def test_missing_yaml_returns_defaults(self, tmp_path):
         import finrag.orchestration.prompt_config as pc
+
         pc._retrieval_config = None
 
         config = load_retrieval_config(version="v99", configs_dir=tmp_path)
@@ -235,6 +231,7 @@ class TestGetActivePromptVersion:
 
     def test_not_loaded(self):
         import finrag.orchestration.prompt_config as pc
+
         pc._generation_config = None
         pc._retrieval_config = None
 
@@ -244,6 +241,7 @@ class TestGetActivePromptVersion:
 
     def test_loaded(self, tmp_path):
         import finrag.orchestration.prompt_config as pc
+
         pc._generation_config = None
         pc._retrieval_config = None
 
@@ -260,6 +258,7 @@ class TestLoadActualConfigs:
 
     def test_load_real_generation_config(self):
         import finrag.orchestration.prompt_config as pc
+
         pc._generation_config = None
 
         configs_dir = Path(__file__).resolve().parent.parent / "configs" / "prompts"
@@ -273,6 +272,7 @@ class TestLoadActualConfigs:
 
     def test_load_real_retrieval_config(self):
         import finrag.orchestration.prompt_config as pc
+
         pc._retrieval_config = None
 
         configs_dir = Path(__file__).resolve().parent.parent / "configs" / "prompts"
@@ -411,7 +411,7 @@ class TestSessionMemory:
 
     def test_add_turn(self):
         session = SessionMemory(session_id="test-2")
-        turn = session.add_turn(
+        session.add_turn(
             query="What was AAPL revenue in FY2024?",
             answer="Revenue was $383B in FY2024.",
         )

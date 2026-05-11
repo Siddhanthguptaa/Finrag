@@ -27,7 +27,7 @@ from finrag.evaluation.golden_dataset import (
     load_by_category,
     load_golden_dataset,
 )
-from finrag.evaluation.llm_judge import CitationJudge, JudgeBatchReport
+from finrag.evaluation.llm_judge import CitationJudge
 from finrag.evaluation.ragas_evaluator import RAGASEvaluator
 from finrag.evaluation.run_eval import (
     generate_mock_result,
@@ -40,7 +40,6 @@ from finrag.observability.langfuse_tracer import (
     instrument_pipeline_result,
 )
 
-
 # --------------------------------------------------------------------------- #
 # 1. Module Import Smoke Tests
 # --------------------------------------------------------------------------- #
@@ -50,35 +49,43 @@ class TestModuleImports:
     """Verify all modules import cleanly."""
 
     def test_import_ingestion(self):
-        from finrag.ingestion import edgar_client, chunker
+        from finrag.ingestion import edgar_client
+
         assert edgar_client is not None
 
     def test_import_vectorstore(self):
         from finrag.vectorstore import chroma_store
+
         assert chroma_store is not None
 
     def test_import_retrieval(self):
-        from finrag.retrieval import bm25_index, hybrid
+        from finrag.retrieval import bm25_index
+
         assert bm25_index is not None
 
     def test_import_orchestration(self):
-        from finrag.orchestration import graph, nodes, schemas
+        from finrag.orchestration import graph
+
         assert graph is not None
 
     def test_import_guardrails(self):
-        from finrag.guardrails import input_guard, output_guard, pipeline
+        from finrag.guardrails import input_guard
+
         assert input_guard is not None
 
     def test_import_api(self):
-        from finrag.api import app, routes, middleware
+        from finrag.api import app
+
         assert app is not None
 
     def test_import_observability(self):
         from finrag.observability import langfuse_tracer
+
         assert langfuse_tracer is not None
 
     def test_import_evaluation(self):
-        from finrag.evaluation import golden_dataset, ragas_evaluator, llm_judge
+        from finrag.evaluation import golden_dataset
+
         assert golden_dataset is not None
 
 
@@ -222,6 +229,7 @@ class TestAPIIntegration:
     @pytest.fixture
     def client(self):
         from finrag.api.app import create_app
+
         app = create_app(enable_auth=False, enable_rate_limit=False)
         with TestClient(app) as c:
             yield c

@@ -16,7 +16,6 @@ Debt: DAY-4-001 — Tokenizer uses simple regex. A finance-specific
       tokenizer (handling $, %, B/M/K suffixes) would improve recall.
 """
 
-import json
 import pickle
 import re
 from pathlib import Path
@@ -207,21 +206,23 @@ class BM25Index:
         output: list[dict] = []
         for score, idx in top_results:
             chunk = self._chunks[idx]
-            output.append({
-                "chunk_id": chunk.metadata.chunk_id,
-                "text": chunk.text,
-                "metadata": {
-                    "ticker": chunk.metadata.ticker,
-                    "company_name": chunk.metadata.company_name,
-                    "form_type": chunk.metadata.form_type,
-                    "filing_date": chunk.metadata.filing_date,
-                    "section_name": chunk.metadata.section_name,
-                    "chunk_index": chunk.metadata.chunk_index,
-                    "total_chunks_in_section": chunk.metadata.total_chunks_in_section,
-                    "token_count": chunk.metadata.token_count,
-                },
-                "score": float(score),
-            })
+            output.append(
+                {
+                    "chunk_id": chunk.metadata.chunk_id,
+                    "text": chunk.text,
+                    "metadata": {
+                        "ticker": chunk.metadata.ticker,
+                        "company_name": chunk.metadata.company_name,
+                        "form_type": chunk.metadata.form_type,
+                        "filing_date": chunk.metadata.filing_date,
+                        "section_name": chunk.metadata.section_name,
+                        "chunk_index": chunk.metadata.chunk_index,
+                        "total_chunks_in_section": chunk.metadata.total_chunks_in_section,
+                        "token_count": chunk.metadata.token_count,
+                    },
+                    "score": float(score),
+                }
+            )
 
         logger.info(
             "bm25_query_executed",
@@ -248,10 +249,7 @@ class BM25Index:
             True if the chunk matches the filter.
         """
         if "$and" in where:
-            return all(
-                self._matches_filter(chunk, sub_filter)
-                for sub_filter in where["$and"]
-            )
+            return all(self._matches_filter(chunk, sub_filter) for sub_filter in where["$and"])
 
         meta = chunk.metadata
         for key, value in where.items():

@@ -63,9 +63,7 @@ class CitationScore:
         Returns:
             Weighted average: relevance(0.2) + support(0.4) + accuracy(0.4).
         """
-        self.composite = round(
-            self.relevance * 0.2 + self.support * 0.4 + self.accuracy * 0.4, 4
-        )
+        self.composite = round(self.relevance * 0.2 + self.support * 0.4 + self.accuracy * 0.4, 4)
         return self.composite
 
 
@@ -102,18 +100,10 @@ class JudgeResult:
         if not self.citation_scores:
             return
         n = len(self.citation_scores)
-        self.mean_relevance = round(
-            sum(c.relevance for c in self.citation_scores) / n, 4
-        )
-        self.mean_support = round(
-            sum(c.support for c in self.citation_scores) / n, 4
-        )
-        self.mean_accuracy = round(
-            sum(c.accuracy for c in self.citation_scores) / n, 4
-        )
-        self.mean_composite = round(
-            sum(c.composite for c in self.citation_scores) / n, 4
-        )
+        self.mean_relevance = round(sum(c.relevance for c in self.citation_scores) / n, 4)
+        self.mean_support = round(sum(c.support for c in self.citation_scores) / n, 4)
+        self.mean_accuracy = round(sum(c.accuracy for c in self.citation_scores) / n, 4)
+        self.mean_composite = round(sum(c.composite for c in self.citation_scores) / n, 4)
 
     def to_dict(self) -> dict:
         return {
@@ -200,11 +190,8 @@ def _build_judge_prompt(
             f"  chunk_text: {chunk_text[:500]}\n"
         )
 
-    return (
-        f"**Question:** {question}\n\n"
-        f"**Answer:** {answer}\n\n"
-        f"**Citations to judge:**\n"
-        + "\n".join(citation_entries)
+    return f"**Question:** {question}\n\n**Answer:** {answer}\n\n**Citations to judge:**\n" + "\n".join(
+        citation_entries
     )
 
 
@@ -285,13 +272,9 @@ class CitationJudge:
         llm = self._get_llm()
 
         if llm is not None:
-            result = self._judge_with_llm(
-                llm, question, answer, citations, chunks, item_id
-            )
+            result = self._judge_with_llm(llm, question, answer, citations, chunks, item_id)
         else:
-            result = self._judge_heuristic(
-                question, answer, citations, chunks, item_id
-            )
+            result = self._judge_heuristic(question, answer, citations, chunks, item_id)
 
         result.latency_ms = round((time.perf_counter() - start) * 1000, 2)
         return result
@@ -323,16 +306,16 @@ class CitationJudge:
         prompt = _build_judge_prompt(question, answer, citations, chunks)
 
         try:
-            response = llm.invoke([
-                SystemMessage(content=JUDGE_SYSTEM_PROMPT),
-                HumanMessage(content=prompt),
-            ])
+            response = llm.invoke(
+                [
+                    SystemMessage(content=JUDGE_SYSTEM_PROMPT),
+                    HumanMessage(content=prompt),
+                ]
+            )
             scores = self._parse_judge_response(response.content, citations)
         except Exception as e:
             logger.warning("judge_llm_call_failed", error=str(e))
-            return self._judge_heuristic(
-                question, answer, citations, chunks, item_id
-            )
+            return self._judge_heuristic(question, answer, citations, chunks, item_id)
 
         result = JudgeResult(
             item_id=item_id,
@@ -364,19 +347,13 @@ class CitationJudge:
         end_idx = text.rfind("]")
         if start_idx == -1 or end_idx == -1:
             logger.warning("judge_parse_failed", reason="no JSON array found")
-            return [
-                CitationScore(chunk_id=c.get("chunk_id", ""))
-                for c in citations
-            ]
+            return [CitationScore(chunk_id=c.get("chunk_id", "")) for c in citations]
 
         try:
             parsed = json.loads(text[start_idx : end_idx + 1])
         except json.JSONDecodeError:
             logger.warning("judge_parse_failed", reason="invalid JSON")
-            return [
-                CitationScore(chunk_id=c.get("chunk_id", ""))
-                for c in citations
-            ]
+            return [CitationScore(chunk_id=c.get("chunk_id", "")) for c in citations]
 
         scores = []
         for entry in parsed:

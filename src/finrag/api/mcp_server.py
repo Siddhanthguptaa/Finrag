@@ -83,9 +83,7 @@ TOOL_DEFINITIONS = [
     },
     {
         "name": "list_available_tickers",
-        "description": (
-            "List stock tickers with indexed filings available for querying."
-        ),
+        "description": ("List stock tickers with indexed filings available for querying."),
         "input_schema": {
             "type": "object",
             "properties": {},
@@ -214,9 +212,7 @@ async def call_tool(
 
     try:
         if body.name == "query_financial_data":
-            result = await _tool_query_financial_data(
-                body.arguments, session_store, compiled_graph
-            )
+            result = await _tool_query_financial_data(body.arguments, session_store, compiled_graph)
         elif body.name == "get_session_context":
             result = _tool_get_session_context(body.arguments, session_store)
         elif body.name == "list_available_tickers":
@@ -224,8 +220,7 @@ async def call_tool(
         else:
             return MCPToolCallResponse(
                 call_id=call_id,
-                error=f"Unknown tool: {body.name}. Available: "
-                f"{[t['name'] for t in TOOL_DEFINITIONS]}",
+                error=f"Unknown tool: {body.name}. Available: {[t['name'] for t in TOOL_DEFINITIONS]}",
             )
 
         return MCPToolCallResponse(call_id=call_id, result=result)

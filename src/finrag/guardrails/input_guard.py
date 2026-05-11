@@ -95,9 +95,7 @@ class GuardReport:
                 self.allowed = False
                 self.blocked_by = result.guard_name
             else:
-                self.warnings.append(
-                    f"[{result.guard_name}] {result.message}"
-                )
+                self.warnings.append(f"[{result.guard_name}] {result.message}")
 
 
 # --------------------------------------------------------------------------- #
@@ -245,9 +243,7 @@ PII_PATTERNS: list[tuple[re.Pattern, str]] = [
     ),
     # Phone number: various US formats
     (
-        re.compile(
-            r"\b(?:\+?1[-.\s]?)?\(?[2-9]\d{2}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b"
-        ),
+        re.compile(r"\b(?:\+?1[-.\s]?)?\(?[2-9]\d{2}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b"),
         "Phone number",
     ),
     # Bank account / routing numbers (8-17 digits)

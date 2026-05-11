@@ -21,9 +21,7 @@ from finrag.observability.langfuse_tracer import (
     estimate_cost,
     instrument_pipeline_result,
     metrics,
-    tracer,
 )
-
 
 # --------------------------------------------------------------------------- #
 # Token Cost Estimation
@@ -65,12 +63,7 @@ class TestFailureClassification:
     """Test pipeline failure classification."""
 
     def test_no_failure(self):
-        result = {
-            "answer": "Revenue was $100B",
-            "citations": [{}],
-            "is_valid": True,
-            "retrieved_chunks": [{"id": 1}],
-        }
+        pass
 
     def test_input_guard_block(self):
         result = {"input_guard_blocked": True}
@@ -361,6 +354,7 @@ class TestMetricsEndpoint:
     @pytest.fixture
     def client(self):
         from fastapi.testclient import TestClient
+
         from finrag.api.app import create_app
 
         app = create_app(enable_auth=False, enable_rate_limit=False)

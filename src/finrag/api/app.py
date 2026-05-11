@@ -26,13 +26,13 @@ import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from finrag.api.mcp_server import mcp_router
 from finrag.api.middleware import (
     AuthMiddleware,
     LoggingMiddleware,
     RateLimitMiddleware,
     RequestIDMiddleware,
 )
-from finrag.api.mcp_server import mcp_router
 from finrag.api.routes import router as api_router
 from finrag.orchestration.memory import SessionStore
 from finrag.orchestration.prompt_config import load_generation_config, load_retrieval_config
@@ -188,14 +188,8 @@ def create_app(
         Returns:
             Status dict with pipeline state.
         """
-        pipeline_active = (
-            hasattr(app.state, "compiled_graph") and app.state.compiled_graph is not None
-        )
-        session_count = (
-            app.state.session_store.active_count
-            if hasattr(app.state, "session_store")
-            else 0
-        )
+        pipeline_active = hasattr(app.state, "compiled_graph") and app.state.compiled_graph is not None
+        session_count = app.state.session_store.active_count if hasattr(app.state, "session_store") else 0
         return {
             "status": "healthy",
             "pipeline_active": pipeline_active,

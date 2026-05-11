@@ -50,6 +50,7 @@ class ItemResult:
         answer_generated: The pipeline's actual answer.
         error: Error message if evaluation failed.
     """
+
     item_id: str = ""
     category: str = ""
     faithfulness: float = 0.0
@@ -87,6 +88,7 @@ class EvalReport:
         pass_threshold: Minimum composite score to pass.
         passed: Whether the evaluation passed the threshold.
     """
+
     total_items: int = 0
     results: list[ItemResult] = field(default_factory=list)
     metrics: dict = field(default_factory=dict)
@@ -350,9 +352,7 @@ class RAGASEvaluator:
             EvalReport with per-item and aggregate metrics.
         """
         if len(items) != len(results):
-            raise ValueError(
-                f"Mismatch: {len(items)} items vs {len(results)} results"
-            )
+            raise ValueError(f"Mismatch: {len(items)} items vs {len(results)} results")
 
         item_results = []
         for item, result in zip(items, results):
@@ -427,17 +427,97 @@ class RAGASEvaluator:
 # --------------------------------------------------------------------------- #
 
 _STOPWORDS = {
-    "the", "a", "an", "is", "was", "were", "are", "be", "been", "being",
-    "have", "has", "had", "do", "does", "did", "will", "would", "could",
-    "should", "may", "might", "shall", "can", "to", "of", "in", "for",
-    "on", "with", "at", "by", "from", "as", "into", "through", "during",
-    "before", "after", "above", "below", "between", "and", "but", "or",
-    "not", "no", "nor", "so", "yet", "both", "each", "few", "more",
-    "most", "other", "some", "such", "than", "too", "very", "just",
-    "about", "also", "how", "what", "which", "who", "whom", "this",
-    "that", "these", "those", "it", "its", "i", "we", "you", "he",
-    "she", "they", "me", "him", "her", "us", "them", "my", "your",
-    "his", "our", "their",
+    "the",
+    "a",
+    "an",
+    "is",
+    "was",
+    "were",
+    "are",
+    "be",
+    "been",
+    "being",
+    "have",
+    "has",
+    "had",
+    "do",
+    "does",
+    "did",
+    "will",
+    "would",
+    "could",
+    "should",
+    "may",
+    "might",
+    "shall",
+    "can",
+    "to",
+    "of",
+    "in",
+    "for",
+    "on",
+    "with",
+    "at",
+    "by",
+    "from",
+    "as",
+    "into",
+    "through",
+    "during",
+    "before",
+    "after",
+    "above",
+    "below",
+    "between",
+    "and",
+    "but",
+    "or",
+    "not",
+    "no",
+    "nor",
+    "so",
+    "yet",
+    "both",
+    "each",
+    "few",
+    "more",
+    "most",
+    "other",
+    "some",
+    "such",
+    "than",
+    "too",
+    "very",
+    "just",
+    "about",
+    "also",
+    "how",
+    "what",
+    "which",
+    "who",
+    "whom",
+    "this",
+    "that",
+    "these",
+    "those",
+    "it",
+    "its",
+    "i",
+    "we",
+    "you",
+    "he",
+    "she",
+    "they",
+    "me",
+    "him",
+    "her",
+    "us",
+    "them",
+    "my",
+    "your",
+    "his",
+    "our",
+    "their",
 }
 
 
@@ -450,7 +530,7 @@ def _split_sentences(text: str) -> list[str]:
     Returns:
         List of sentence strings.
     """
-    sentences = re.split(r'[.!?]+', text)
+    sentences = re.split(r"[.!?]+", text)
     return [s.strip() for s in sentences if s.strip() and len(s.strip()) > 5]
 
 

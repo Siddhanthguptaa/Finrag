@@ -72,30 +72,38 @@ def generate_mock_result(item: GoldenItem) -> dict:
     chunks = []
     for i, ref in enumerate(item.ground_truth_citations):
         chunk_id = f"chunk_{item.id}_{i}"
-        citations.append({
-            "chunk_id": chunk_id,
-            "filing_reference": ref,
-            "section": f"Section {i + 1}",
-            "relevance_score": 0.85 - (i * 0.05),
-        })
-        chunks.append({
-            "chunk_id": chunk_id,
-            "text": f"Source data from {ref}: {answer[:100]}",
-            "id": chunk_id,
-        })
+        citations.append(
+            {
+                "chunk_id": chunk_id,
+                "filing_reference": ref,
+                "section": f"Section {i + 1}",
+                "relevance_score": 0.85 - (i * 0.05),
+            }
+        )
+        chunks.append(
+            {
+                "chunk_id": chunk_id,
+                "text": f"Source data from {ref}: {answer[:100]}",
+                "id": chunk_id,
+            }
+        )
 
     # If no ground truth citations, create a default
     if not citations:
         chunk_id = f"chunk_{item.id}_0"
-        citations.append({
-            "chunk_id": chunk_id,
-            "filing_reference": "Generic Filing Reference",
-            "relevance_score": 0.7,
-        })
-        chunks.append({
-            "chunk_id": chunk_id,
-            "text": f"Context for: {answer[:100]}",
-        })
+        citations.append(
+            {
+                "chunk_id": chunk_id,
+                "filing_reference": "Generic Filing Reference",
+                "relevance_score": 0.7,
+            }
+        )
+        chunks.append(
+            {
+                "chunk_id": chunk_id,
+                "text": f"Context for: {answer[:100]}",
+            }
+        )
 
     return {
         "answer": answer,
@@ -160,10 +168,7 @@ def run_judge_eval(
     """
     if items is None:
         # Only judge items that have citations (not decline)
-        items = [
-            i for i in load_golden_dataset()
-            if i.expected_route != "decline"
-        ]
+        items = [i for i in load_golden_dataset() if i.expected_route != "decline"]
 
     judge = CitationJudge(model_name=model)
     batch_results = []

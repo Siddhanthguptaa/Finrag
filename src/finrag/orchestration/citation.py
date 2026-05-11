@@ -151,28 +151,17 @@ class CitationEnforcer:
 
         # Check 1: Confidence threshold
         if answer.confidence < self._confidence_threshold:
-            result.add_error(
-                f"Confidence {answer.confidence:.2f} below threshold "
-                f"{self._confidence_threshold:.2f}"
-            )
+            result.add_error(f"Confidence {answer.confidence:.2f} below threshold {self._confidence_threshold:.2f}")
 
         # Check 2: Relevance floor (top reranker score)
         if context_chunks:
-            top_score = max(
-                c.get("reranker_score", 0.0) for c in context_chunks
-            )
+            top_score = max(c.get("reranker_score", 0.0) for c in context_chunks)
             if top_score < self._relevance_floor:
-                result.add_error(
-                    f"Top relevance score {top_score:.2f} below floor "
-                    f"{self._relevance_floor:.2f}"
-                )
+                result.add_error(f"Top relevance score {top_score:.2f} below floor {self._relevance_floor:.2f}")
 
         # Check 3: Minimum citation count
         if len(answer.citations) < self._min_citations:
-            result.add_error(
-                f"Only {len(answer.citations)} citations, "
-                f"minimum required: {self._min_citations}"
-            )
+            result.add_error(f"Only {len(answer.citations)} citations, minimum required: {self._min_citations}")
 
         # Check 4: Citation validity (hallucination detection)
         valid_count = 0
@@ -182,8 +171,7 @@ class CitationEnforcer:
             else:
                 result.hallucinated_ids.append(citation.chunk_id)
                 result.add_error(
-                    f"Hallucinated citation: chunk_id '{citation.chunk_id}' "
-                    f"not found in retrieved context"
+                    f"Hallucinated citation: chunk_id '{citation.chunk_id}' not found in retrieved context"
                 )
 
         result.valid_citation_count = valid_count
@@ -218,9 +206,7 @@ class CitationEnforcer:
         if not context_chunks:
             return True, "No context chunks available after retrieval."
 
-        top_score = max(
-            c.get("reranker_score", 0.0) for c in context_chunks
-        )
+        top_score = max(c.get("reranker_score", 0.0) for c in context_chunks)
 
         if top_score < self._relevance_floor:
             return True, (

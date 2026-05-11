@@ -12,20 +12,18 @@ Both ChromaStore and BM25Index are mocked to keep tests fast
 and focused on fusion logic, not embedding/tokenization.
 """
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
 from finrag.retrieval.hybrid import (
     DEFAULT_CANDIDATES_PER_RETRIEVER,
-    FINANCIAL_SYNONYMS,
     RRF_K,
     HybridRetriever,
     expand_financial_query,
     hyde_passthrough,
     reciprocal_rank_fusion,
 )
-
 
 # --------------------------------------------------------------------------- #
 # Helpers
@@ -196,10 +194,7 @@ class TestExpandFinancialQuery:
         assert len(result) > 1
         # Check at least one synonym made it
         lower_results = [r.lower() for r in result]
-        has_synonym = any(
-            "net sales" in r or "total revenue" in r
-            for r in lower_results
-        )
+        has_synonym = any("net sales" in r or "total revenue" in r for r in lower_results)
         assert has_synonym
 
     def test_eps_expansion(self) -> None:
@@ -298,9 +293,7 @@ class TestHybridRetrieverInit:
         assert stats["rrf_k"] == 30
         assert stats["candidates_per_retriever"] == 50
 
-    def test_custom_multi_query_fn(
-        self, mock_chroma: MagicMock, mock_bm25: MagicMock
-    ) -> None:
+    def test_custom_multi_query_fn(self, mock_chroma: MagicMock, mock_bm25: MagicMock) -> None:
         """Custom multi-query function is used when provided."""
         custom_fn = MagicMock(return_value=["q1", "q2"])
         r = HybridRetriever(
@@ -311,9 +304,7 @@ class TestHybridRetrieverInit:
         r.retrieve("test query", use_multi_query=True)
         custom_fn.assert_called_once_with("test query")
 
-    def test_custom_hyde_fn(
-        self, mock_chroma: MagicMock, mock_bm25: MagicMock
-    ) -> None:
+    def test_custom_hyde_fn(self, mock_chroma: MagicMock, mock_bm25: MagicMock) -> None:
         """Custom HyDE function is used when provided."""
         custom_hyde = MagicMock(return_value="hypothetical document about revenue")
         r = HybridRetriever(
@@ -339,9 +330,7 @@ class TestHybridRetrieve:
             assert "rrf_score" in r
             assert "retrieval_sources" in r
 
-    def test_overlap_boosted(
-        self, retriever: HybridRetriever
-    ) -> None:
+    def test_overlap_boosted(self, retriever: HybridRetriever) -> None:
         """Chunks found by both stores rank higher.
 
         mock_chroma returns: aapl_rev, aapl_risk, msft_rev
@@ -525,7 +514,7 @@ class TestSingleSourceRetrieve:
         mock_bm25: MagicMock,
     ) -> None:
         """Dense-only retrieval skips BM25."""
-        results = retriever.retrieve_dense_only("test query", n_results=3)
+        retriever.retrieve_dense_only("test query", n_results=3)
         mock_chroma.query.assert_called_once()
         mock_bm25.query.assert_not_called()
 
@@ -536,7 +525,7 @@ class TestSingleSourceRetrieve:
         mock_bm25: MagicMock,
     ) -> None:
         """Sparse-only retrieval skips vector search."""
-        results = retriever.retrieve_sparse_only("test query", n_results=3)
+        retriever.retrieve_sparse_only("test query", n_results=3)
         mock_bm25.query.assert_called_once()
         mock_chroma.query.assert_not_called()
 

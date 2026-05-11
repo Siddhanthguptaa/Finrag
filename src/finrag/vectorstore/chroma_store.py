@@ -254,12 +254,14 @@ class ChromaStore:
         output: list[dict] = []
         if results["ids"] and results["ids"][0]:
             for i, chunk_id in enumerate(results["ids"][0]):
-                output.append({
-                    "chunk_id": chunk_id,
-                    "text": results["documents"][0][i],
-                    "metadata": results["metadatas"][0][i],
-                    "distance": results["distances"][0][i],
-                })
+                output.append(
+                    {
+                        "chunk_id": chunk_id,
+                        "text": results["documents"][0][i],
+                        "metadata": results["metadatas"][0][i],
+                        "distance": results["distances"][0][i],
+                    }
+                )
 
         logger.info(
             "query_executed",

@@ -13,15 +13,13 @@ from finrag.config import Settings
 from finrag.ingestion.edgar_client import (
     EdgarClient,
     FilingMetadata,
-    ParsedFiling,
     TickerNotFoundError,
-    FilingNotFoundError,
 )
-
 
 # --------------------------------------------------------------------------- #
 # Fixtures
 # --------------------------------------------------------------------------- #
+
 
 @pytest.fixture
 def settings() -> Settings:
@@ -81,6 +79,7 @@ def sample_10k_html() -> str:
 # Config validation tests
 # --------------------------------------------------------------------------- #
 
+
 class TestConfig:
     """Tests for Settings validation."""
 
@@ -112,12 +111,11 @@ class TestConfig:
 # Section parsing tests (unit tests, no network)
 # --------------------------------------------------------------------------- #
 
+
 class TestSectionParsing:
     """Tests for section parsing from filing HTML."""
 
-    def test_parse_10k_sections(
-        self, settings: Settings, sample_10k_html: str
-    ) -> None:
+    def test_parse_10k_sections(self, settings: Settings, sample_10k_html: str) -> None:
         """Parser should extract known 10-K sections from HTML."""
         client = EdgarClient(settings)
         sections = client.parse_sections(sample_10k_html, "10-K")
@@ -134,9 +132,7 @@ class TestSectionParsing:
         assert found_any_risk, f"No Risk section found. Keys: {section_keys}"
         assert found_any_mda, f"No MD&A section found. Keys: {section_keys}"
 
-    def test_parse_10k_section_content(
-        self, settings: Settings, sample_10k_html: str
-    ) -> None:
+    def test_parse_10k_section_content(self, settings: Settings, sample_10k_html: str) -> None:
         """Parsed sections should contain the actual filing text."""
         client = EdgarClient(settings)
         sections = client.parse_sections(sample_10k_html, "10-K")
@@ -174,6 +170,7 @@ class TestSectionParsing:
 # --------------------------------------------------------------------------- #
 # Integration tests (require network access to SEC EDGAR)
 # --------------------------------------------------------------------------- #
+
 
 @pytest.mark.asyncio
 class TestEdgarClientIntegration:

@@ -33,7 +33,7 @@ import structlog
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from finrag.orchestration.citation import CitationEnforcer
-from finrag.orchestration.schemas import CitedAnswer, Citation, build_filing_reference
+from finrag.orchestration.schemas import CitedAnswer, build_filing_reference
 
 logger = structlog.get_logger(__name__)
 
@@ -262,9 +262,7 @@ class RAGGenerator:
                 attempt=2,
             )
             error_str = "\n".join(f"- {e}" for e in enforcement.errors)
-            answer = self._call_llm(
-                query, context_str, retry_errors=error_str
-            )
+            answer = self._call_llm(query, context_str, retry_errors=error_str)
             enforcement = self._enforcer.enforce(answer, context_chunks)
 
             if enforcement.is_valid:
@@ -307,9 +305,7 @@ class RAGGenerator:
             system += RETRY_PROMPT_SUFFIX.format(errors=retry_errors)
 
         user_message = (
-            f"QUESTION: {query}\n\n"
-            f"CONTEXT:\n{context}\n\n"
-            f"Generate a cited answer using ONLY the context above."
+            f"QUESTION: {query}\n\nCONTEXT:\n{context}\n\nGenerate a cited answer using ONLY the context above."
         )
 
         try:

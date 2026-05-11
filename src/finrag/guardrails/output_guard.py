@@ -101,16 +101,16 @@ def check_investment_advice_in_output(answer: str) -> GuardResult:
     for pattern, description in ADVICE_PATTERNS:
         match = pattern.search(answer)
         if match:
-            found.append({
-                "pattern": description,
-                "matched_text": match.group()[:50],
-            })
+            found.append(
+                {
+                    "pattern": description,
+                    "matched_text": match.group()[:50],
+                }
+            )
 
     if found:
         # "Guaranteed return" / "sure thing" is BLOCK-worthy
-        has_misleading = any(
-            f["pattern"] == "Misleading financial promise" for f in found
-        )
+        has_misleading = any(f["pattern"] == "Misleading financial promise" for f in found)
         severity = Severity.BLOCK if has_misleading else Severity.WARN
 
         logger.warning(
@@ -122,8 +122,7 @@ def check_investment_advice_in_output(answer: str) -> GuardResult:
             passed=False,
             guard_name="output_advice_check",
             severity=severity,
-            message=f"Investment advice language detected: "
-            f"{', '.join(f['pattern'] for f in found)}",
+            message=f"Investment advice language detected: {', '.join(f['pattern'] for f in found)}",
             details={"matches": found},
         )
 
@@ -333,9 +332,7 @@ class OutputGuardReport:
             if result.severity == Severity.BLOCK:
                 self.allowed = False
             else:
-                self.warnings.append(
-                    f"[{result.guard_name}] {result.message}"
-                )
+                self.warnings.append(f"[{result.guard_name}] {result.message}")
 
 
 def run_output_guards(
@@ -387,9 +384,7 @@ def run_output_guards(
         report.redactions_made = redactions
 
     # Step 3: Add disclaimer if needed
-    current_answer, disclaimer_added = maybe_add_disclaimer(
-        current_answer, generation_model
-    )
+    current_answer, disclaimer_added = maybe_add_disclaimer(current_answer, generation_model)
     report.disclaimer_added = disclaimer_added
 
     report.scrubbed_answer = current_answer

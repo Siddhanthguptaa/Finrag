@@ -52,9 +52,7 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
     X-Request-ID if present for end-to-end tracing.
     """
 
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         """Process request with ID injection.
 
         Args:
@@ -95,9 +93,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.api_key = api_key or os.environ.get("FINRAG_API_KEY", "")
 
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         """Validate auth token.
 
         Args:
@@ -165,9 +161,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.window_seconds = window_seconds
         self._requests: dict[str, list[float]] = defaultdict(list)
 
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         """Check rate limit for client IP.
 
         Args:
@@ -184,9 +178,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         now = time.time()
         cutoff = now - self.window_seconds
 
-        self._requests[client_ip] = [
-            ts for ts in self._requests[client_ip] if ts > cutoff
-        ]
+        self._requests[client_ip] = [ts for ts in self._requests[client_ip] if ts > cutoff]
 
         if len(self._requests[client_ip]) >= self.max_requests:
             logger.warning(
@@ -197,10 +189,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             return JSONResponse(
                 status_code=429,
                 content={
-                    "detail": (
-                        f"Rate limit exceeded. "
-                        f"Max {self.max_requests} requests per {self.window_seconds}s."
-                    ),
+                    "detail": (f"Rate limit exceeded. Max {self.max_requests} requests per {self.window_seconds}s."),
                 },
                 headers={"Retry-After": str(self.window_seconds)},
             )
@@ -221,9 +210,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
     Uses structlog for consistent JSON output.
     """
 
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         """Log request and response details.
 
         Args:

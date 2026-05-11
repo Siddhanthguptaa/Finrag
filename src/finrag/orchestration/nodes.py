@@ -254,10 +254,7 @@ def generate(
         }
 
         if not enforcement_passed:
-            result["error"] = (
-                "Citation enforcement failed: "
-                + "; ".join(errors)
-            )
+            result["error"] = "Citation enforcement failed: " + "; ".join(errors)
 
         logger.info(
             "generate_complete",
@@ -298,8 +295,7 @@ def _generate_stub(query: str, chunks: list[dict], step_count: int) -> dict:
     stub_answer = (
         f"[STUB — No LLM configured]\n\n"
         f"Query: {query}\n\n"
-        f"Based on {len(chunks)} retrieved chunks:\n\n"
-        + "\n---\n".join(context_texts[:3])
+        f"Based on {len(chunks)} retrieved chunks:\n\n" + "\n---\n".join(context_texts[:3])
     )
 
     stub_citations = [
@@ -401,10 +397,7 @@ def calculate(
         }
 
         if not enforcement_passed:
-            result["error"] = (
-                "Citation enforcement failed: "
-                + "; ".join(errors)
-            )
+            result["error"] = "Citation enforcement failed: " + "; ".join(errors)
 
         logger.info(
             "calculate_complete",
@@ -518,9 +511,9 @@ def decline(state: GraphState) -> dict:
         "or market predictions. For those, please consult a licensed "
         "financial advisor.\n\n"
         "Try asking questions like:\n"
-        "- \"What was Apple's revenue in fiscal year 2024?\"\n"
-        "- \"What risk factors did Tesla disclose in their latest 10-K?\"\n"
-        "- \"How did Microsoft's cloud revenue change year over year?\""
+        '- "What was Apple\'s revenue in fiscal year 2024?"\n'
+        '- "What risk factors did Tesla disclose in their latest 10-K?"\n'
+        '- "How did Microsoft\'s cloud revenue change year over year?"'
     )
 
     logger.info("query_declined", query_preview=query[:80])

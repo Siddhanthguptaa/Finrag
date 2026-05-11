@@ -17,11 +17,10 @@ from finrag.orchestration.citation import (
     EnforcementResult,
 )
 from finrag.orchestration.schemas import (
-    CitedAnswer,
     Citation,
+    CitedAnswer,
     build_filing_reference,
 )
-
 
 # --------------------------------------------------------------------------- #
 # Fixtures
@@ -165,20 +164,24 @@ class TestBuildFilingReference:
 
     def test_full_metadata(self) -> None:
         """All fields present."""
-        ref = build_filing_reference({
-            "ticker": "AAPL",
-            "form_type": "10-K",
-            "fiscal_period": "FY2024",
-            "section_name": "Item 7 - MD&A",
-        })
+        ref = build_filing_reference(
+            {
+                "ticker": "AAPL",
+                "form_type": "10-K",
+                "fiscal_period": "FY2024",
+                "section_name": "Item 7 - MD&A",
+            }
+        )
         assert ref == "AAPL 10-K FY2024, Item 7 - MD&A"
 
     def test_partial_metadata(self) -> None:
         """Only ticker and form_type."""
-        ref = build_filing_reference({
-            "ticker": "MSFT",
-            "form_type": "10-Q",
-        })
+        ref = build_filing_reference(
+            {
+                "ticker": "MSFT",
+                "form_type": "10-Q",
+            }
+        )
         assert ref == "MSFT 10-Q"
 
     def test_empty_metadata(self) -> None:
@@ -432,9 +435,7 @@ class TestRAGGenerator:
         assert answer.citations[0].chunk_id == "aapl_rev_001"
 
     @patch("finrag.orchestration.generator.ChatGoogleGenerativeAI")
-    def test_hallucinated_citation_triggers_retry(
-        self, mock_llm_cls: MagicMock, valid_chunks: list[dict]
-    ) -> None:
+    def test_hallucinated_citation_triggers_retry(self, mock_llm_cls: MagicMock, valid_chunks: list[dict]) -> None:
         """Hallucinated citation triggers retry with stricter prompt."""
         from finrag.orchestration.generator import RAGGenerator
 
@@ -466,9 +467,7 @@ class TestRAGGenerator:
         assert mock_structured.invoke.call_count == 2
 
     @patch("finrag.orchestration.generator.ChatGoogleGenerativeAI")
-    def test_both_attempts_fail(
-        self, mock_llm_cls: MagicMock, valid_chunks: list[dict]
-    ) -> None:
+    def test_both_attempts_fail(self, mock_llm_cls: MagicMock, valid_chunks: list[dict]) -> None:
         """Both generation attempts failing returns errors."""
         from finrag.orchestration.generator import RAGGenerator
 

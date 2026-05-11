@@ -58,24 +58,138 @@ PERIOD_PATTERN = re.compile(
 
 # Common non-ticker words that match the ticker pattern
 TICKER_STOPWORDS = {
-    "A", "I", "AM", "AN", "AS", "AT", "BE", "BY", "DO", "GO",
-    "IF", "IN", "IS", "IT", "MY", "NO", "OF", "ON", "OR", "SO",
-    "TO", "UP", "US", "WE", "THE", "AND", "FOR", "NOT", "BUT",
-    "YOU", "ALL", "CAN", "HAD", "HER", "WAS", "ONE", "OUR",
-    "OUT", "HAS", "HIS", "HOW", "ITS", "MAY", "NEW", "NOW",
-    "OLD", "SEE", "WAY", "WHO", "DID", "GET", "HIM", "LET",
-    "SAY", "SHE", "TOO", "USE", "SEC", "CEO", "CFO", "COO",
-    "CTO", "VP", "SVP", "EVP", "MD", "YOY", "QOQ", "EPS",
-    "PE", "PB", "ROE", "ROA", "EBITDA", "IPO", "GDP", "CPI",
-    "WHAT", "WHEN", "HOW", "WHY", "MUCH", "MANY", "DOES",
-    "WERE", "BEEN", "HAVE", "FROM", "THIS", "THAT", "THAN",
-    "WITH", "WILL", "OVER", "ALSO", "MORE", "SOME", "VERY",
-    "JUST", "LIKE", "MAKE", "LAST", "YEAR", "EACH", "SAME",
-    "BOTH", "MOST", "ONLY", "SUCH", "THEM", "THEN", "WHAT",
-    "RISK", "ITEM", "TOTAL", "GROSS", "WHICH", "ABOUT",
-    "COULD", "THEIR", "WOULD", "THERE", "OTHER", "AFTER",
-    "FIRST", "THOSE", "THESE", "BEING", "WHILE", "WHERE",
-    "BASED", "SINCE",
+    "A",
+    "I",
+    "AM",
+    "AN",
+    "AS",
+    "AT",
+    "BE",
+    "BY",
+    "DO",
+    "GO",
+    "IF",
+    "IN",
+    "IS",
+    "IT",
+    "MY",
+    "NO",
+    "OF",
+    "ON",
+    "OR",
+    "SO",
+    "TO",
+    "UP",
+    "US",
+    "WE",
+    "THE",
+    "AND",
+    "FOR",
+    "NOT",
+    "BUT",
+    "YOU",
+    "ALL",
+    "CAN",
+    "HAD",
+    "HER",
+    "WAS",
+    "ONE",
+    "OUR",
+    "OUT",
+    "HAS",
+    "HIS",
+    "HOW",
+    "ITS",
+    "MAY",
+    "NEW",
+    "NOW",
+    "OLD",
+    "SEE",
+    "WAY",
+    "WHO",
+    "DID",
+    "GET",
+    "HIM",
+    "LET",
+    "SAY",
+    "SHE",
+    "TOO",
+    "USE",
+    "SEC",
+    "CEO",
+    "CFO",
+    "COO",
+    "CTO",
+    "VP",
+    "SVP",
+    "EVP",
+    "MD",
+    "YOY",
+    "QOQ",
+    "EPS",
+    "PE",
+    "PB",
+    "ROE",
+    "ROA",
+    "EBITDA",
+    "IPO",
+    "GDP",
+    "CPI",
+    "WHAT",
+    "WHEN",
+    "HOW",
+    "WHY",
+    "MUCH",
+    "MANY",
+    "DOES",
+    "WERE",
+    "BEEN",
+    "HAVE",
+    "FROM",
+    "THIS",
+    "THAT",
+    "THAN",
+    "WITH",
+    "WILL",
+    "OVER",
+    "ALSO",
+    "MORE",
+    "SOME",
+    "VERY",
+    "JUST",
+    "LIKE",
+    "MAKE",
+    "LAST",
+    "YEAR",
+    "EACH",
+    "SAME",
+    "BOTH",
+    "MOST",
+    "ONLY",
+    "SUCH",
+    "THEM",
+    "THEN",
+    "WHAT",
+    "RISK",
+    "ITEM",
+    "TOTAL",
+    "GROSS",
+    "WHICH",
+    "ABOUT",
+    "COULD",
+    "THEIR",
+    "WOULD",
+    "THERE",
+    "OTHER",
+    "AFTER",
+    "FIRST",
+    "THOSE",
+    "THESE",
+    "BEING",
+    "WHILE",
+    "WHERE",
+    "BASED",
+    "SINCE",
 }
 
 
@@ -307,19 +421,13 @@ class SessionMemory:
                     # Use the most recently discussed entity
                     last_entity = self.turns[-1].entities[-1] if self.turns[-1].entities else None
                     if last_entity:
-                        context_parts.append(
-                            f"(Note: '{ref_type}' likely refers to {last_entity})"
-                        )
+                        context_parts.append(f"(Note: '{ref_type}' likely refers to {last_entity})")
                 elif ref_type == "period" and self.all_periods:
                     last_period = list(self.all_periods)[-1]
-                    context_parts.append(
-                        f"(Note: time reference likely refers to {last_period})"
-                    )
+                    context_parts.append(f"(Note: time reference likely refers to {last_period})")
                 elif ref_type == "filing" and self.all_filings:
                     last_filing = list(self.all_filings)[-1]
-                    context_parts.append(
-                        f"(Note: filing reference likely refers to {last_filing})"
-                    )
+                    context_parts.append(f"(Note: filing reference likely refers to {last_filing})")
 
         if context_parts:
             resolved = f"{query}\n\n{'  '.join(context_parts)}"
@@ -404,10 +512,7 @@ def extract_entities(text: str) -> list[str]:
         List of unique entity strings.
     """
     matches = TICKER_PATTERN.findall(text)
-    entities = [
-        m for m in matches
-        if m not in TICKER_STOPWORDS and len(m) >= 2
-    ]
+    entities = [m for m in matches if m not in TICKER_STOPWORDS and len(m) >= 2]
     return list(dict.fromkeys(entities))  # Deduplicate preserving order
 
 

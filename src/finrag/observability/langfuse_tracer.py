@@ -46,7 +46,7 @@ import os
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 
 import structlog
 
@@ -68,9 +68,7 @@ MODEL_COSTS = {
 }
 
 
-def estimate_cost(
-    model: str, input_tokens: int, output_tokens: int
-) -> float:
+def estimate_cost(model: str, input_tokens: int, output_tokens: int) -> float:
     """Estimate USD cost for a model invocation.
 
     Args:
@@ -82,9 +80,7 @@ def estimate_cost(
         Estimated cost in USD.
     """
     costs = MODEL_COSTS.get(model, {"input": 0.0001, "output": 0.0004})
-    return (input_tokens * costs["input"] / 1000) + (
-        output_tokens * costs["output"] / 1000
-    )
+    return (input_tokens * costs["input"] / 1000) + (output_tokens * costs["output"] / 1000)
 
 
 # --------------------------------------------------------------------------- #
@@ -92,7 +88,7 @@ def estimate_cost(
 # --------------------------------------------------------------------------- #
 
 
-class FailureType(str, Enum):
+class FailureType(StrEnum):
     """Classification of pipeline failures for structured logging."""
 
     RETRIEVAL_EMPTY = "retrieval_empty"
@@ -281,18 +277,10 @@ class MetricsCollector:
             }
 
         return {
-            "decline_rate": round(
-                self._counters.get("declines", 0) / total, 4
-            ),
-            "citation_coverage": round(
-                self._counters.get("cited_responses", 0) / total, 4
-            ),
-            "input_block_rate": round(
-                self._counters.get("input_blocks", 0) / total, 4
-            ),
-            "output_block_rate": round(
-                self._counters.get("output_blocks", 0) / total, 4
-            ),
+            "decline_rate": round(self._counters.get("declines", 0) / total, 4),
+            "citation_coverage": round(self._counters.get("cited_responses", 0) / total, 4),
+            "input_block_rate": round(self._counters.get("input_blocks", 0) / total, 4),
+            "output_block_rate": round(self._counters.get("output_blocks", 0) / total, 4),
         }
 
     def get_summary(self) -> dict:
@@ -602,9 +590,7 @@ class FinRAGTracer:
         Returns:
             Summary dict with latency, cost, failure info.
         """
-        total_latency_ms = round(
-            (time.time() - trace_ctx["start_time"]) * 1000, 2
-        )
+        total_latency_ms = round((time.time() - trace_ctx["start_time"]) * 1000, 2)
         metrics.record_latency("total", total_latency_ms)
 
         result = result or {}

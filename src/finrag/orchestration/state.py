@@ -19,7 +19,6 @@ from typing import Annotated, TypedDict
 
 from langgraph.graph import add_messages
 
-
 # --------------------------------------------------------------------------- #
 # Query Route Enum
 # --------------------------------------------------------------------------- #
